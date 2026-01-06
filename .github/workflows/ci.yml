@@ -2,9 +2,14 @@ name: CI
 
 on:
   pull_request:
-    branches: [develop, main]
+    branches:
+      - develop
   push:
-    branches: [develop]
+    branches:
+      - develop
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -13,9 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build iOS app
+      - name: Build
         run: |
           xcodebuild clean build \
             -project LaterApp/LaterApp.xcodeproj \
             -scheme LaterApp \
-            -destination "generic/platform=iOS Simulator"
+            -destination "platform=iOS Simulator,name=Any iOS Simulator Device"
