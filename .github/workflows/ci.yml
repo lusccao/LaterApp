@@ -2,9 +2,9 @@ name: CI
 
 on:
   pull_request:
-    branches:
-      - develop
-      - main
+    branches: [develop, main]
+  push:
+    branches: [develop]
 
 jobs:
   build:
@@ -13,12 +13,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode.app
-
-      - name: Build
+      - name: Build iOS app
         run: |
           xcodebuild clean build \
             -project LaterApp/LaterApp.xcodeproj \
             -scheme LaterApp \
-            -destination 'platform=iOS Simulator,name=iPhone 15'
+            -destination "generic/platform=iOS Simulator"
