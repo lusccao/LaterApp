@@ -1,12 +1,22 @@
-## O que foi feito
+## 📌 O que foi feito
+Descreva objetivamente o que mudou neste PR.
+
+- 
 - 
 
-## Por quê
+## 🎯 Por quê
+Explique o motivo da mudança (história, bug, melhoria técnica).
+
 - 
 
-## Como testar
-- 
+## 🧪 Como testar
+Passos simples para validar a mudança.
 
-## Checklist
-- [ ] Build passou
+1. 
+2. 
+
+## ✅ Checklist
+- [ ] Build passa localmente
+- [ ] CI passou
 - [ ] Código revisado
+- [ ] Não há warnings
