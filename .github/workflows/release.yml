@@ -11,10 +11,39 @@ permissions:
 jobs:
   release:
     runs-on: macos-latest
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read app version
+        id: version
+        run: |
+          VERSION=$(xcodebuild -showBuildSettings \
+            -project LaterApp/LaterApp.xcodeproj \
+            -scheme LaterApp \
+            | grep MARKETING_VERSION \
+            | head -n 1 \
+            | awk '{print $3}')
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version detected: $VERSION"
+
+      - name: Check tag
+        run: |
+          if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "Tag already exists"
+            exit 1
+          fi
+
+      - name: Create tag
+        run: |
+          git tag v${{ steps.version.outputs.version }}
+          git push origin v${{ steps.version.outputs.version }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ steps.version.outputs.version }}
           generate_release_notes: true
