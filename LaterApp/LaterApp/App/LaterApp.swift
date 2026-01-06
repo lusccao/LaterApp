@@ -8,10 +8,10 @@
 import SwiftUI
 
 @main
-struct LaterAppApp: App {
+struct LaterApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
         }
     }
 }
