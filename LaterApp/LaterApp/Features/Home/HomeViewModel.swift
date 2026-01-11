@@ -10,5 +10,16 @@ import Observation
 
 @Observable
 final class HomeViewModel {
-    var title: String = "Welcome to LaterApp!"
+    private let store: LaterItemStore
+    
+    private(set) var items: [LaterItem] = []
+    
+    init(store: LaterItemStore) {
+        self.store = store
+        loadItems()
+    }
+    
+    func loadItems() {
+        items = store.fetchAll()
+    }
 }
