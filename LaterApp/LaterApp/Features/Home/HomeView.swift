@@ -8,21 +8,18 @@
 import SwiftUI
 
 struct HomeView: View {
-    
-    @State private var viewModel: HomeViewModel
-    
-    init(viewModel: HomeViewModel) {
-        _viewModel = State(initialValue: viewModel)
-    }
+    let viewModel: HomeViewModel
     
     var body: some View {
-        VStack(spacing: 16) {
-            Text("Home")
-                .font(.largeTitle)
-            
-            Text("itens: \(viewModel.items.count)")
-                .font(.headline)
+        List {
+            ForEach(viewModel.sections) { section in
+                Section(section.title) {
+                    ForEach(section.items) { item in
+                        Text(item.title)
+                    }
+                }
+            }
         }
-        .navigationTitle("Listas")
+        .navigationTitle("Later")
     }
 }

@@ -11,7 +11,12 @@ final class InMemoryLaterItemStorage: LaterItemStore {
    
     private var items: [LaterItem] = []
     
-    init(items: [LaterItem] = []) {
+    init(items: [LaterItem] = [
+            LaterItem(id: UUID(), title: "Interstellar", type: .movie),
+            LaterItem(id: UUID(), title: "Breaking Bad", type: .series),
+            LaterItem(id: UUID(), title: "Clean Architecture", type: .book),
+            LaterItem(id: UUID(), title: "Comprar café", type: .task)
+    ]) {
         self.items = items
     }
     

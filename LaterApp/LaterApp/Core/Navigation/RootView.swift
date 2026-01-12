@@ -13,13 +13,15 @@ struct RootView: View {
     
     var body: some View {
         NavigationStack {
-            HomeView(viewModel: HomeViewModel(store: store))
+            HomeView(
+                viewModel: HomeViewModel(store: store)
+            )
         }
     }
 }
 
 #Preview {
     RootView(
-        store: InMemoryLaterItemStorage()
+        store: InMemoryLaterItemStorage(items: [])
     )
 }

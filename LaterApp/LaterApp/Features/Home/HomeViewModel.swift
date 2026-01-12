@@ -10,45 +10,22 @@ import Observation
 
 @Observable
 final class HomeViewModel {
-    private let store: LaterItemStore
     
-    private(set) var items: [LaterItem] = []
+    let store: LaterItemStore
+    
+    var sections: [HomeSection] = []
     
     init(store: LaterItemStore) {
         self.store = store
-        loadItems()
+        load()
     }
     
     // MARK: - FUNCTIONS
-    private func loadItems() {
-        items = store.fetchAll()
-    }
-    
-    func addItem(title: String,
-                 type: LaterItemType,
-                 cover: LaterItemCover? = nil) {
-        let newItem = LaterItem(title: title,
-                                type: type,
-                                cover: cover)
-        store.add(newItem)
-        loadItems()
-    }
-    
-    func completeItem(_ item: LaterItem) {
-        let updateItem = LaterItem(id: item.id,
-                                   title: item.title,
-                                   type: item.type,
-                                   status: item.status,
-                                   cover: item.cover,
-                                   createdAt: item.createdAt,
-                                   completedAt: Date()
-        )
-        store.update(updateItem)
-        loadItems()
-    }
-    
-    func removeItem(_ item: LaterItem) {
-        store.remove(item)
-        loadItems()
+    private func load() {
+        let items = store.fetchAll()
+        
+        sections = Dictionary(grouping: items, by: \.type)
+            .map { HomeSection(type: $0.key, items: $0.value) }
+            .sorted {$0.type.rawValue < $1.type.rawValue }
     }
 }
