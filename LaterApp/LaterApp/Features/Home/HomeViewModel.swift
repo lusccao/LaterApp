@@ -11,9 +11,10 @@ import Observation
 @Observable
 final class HomeViewModel {
     
-    let store: LaterItemStore
+    private let store: LaterItemStore
     
     var sections: [HomeSection] = []
+    var state: HomeViewState = .empty
     
     init(store: LaterItemStore) {
         self.store = store
@@ -24,8 +25,23 @@ final class HomeViewModel {
     private func load() {
         let items = store.fetchAll()
         
+        guard !items.isEmpty else {
+            sections = []
+            state = .empty
+            return
+        }
+        
         sections = Dictionary(grouping: items, by: \.type)
-            .map { HomeSection(type: $0.key, items: $0.value) }
-            .sorted {$0.type.rawValue < $1.type.rawValue }
+            .map { type, items in
+                let sortedItems = items.sorted {
+                    $0.createdAt < $1.createdAt
+                }
+                return HomeSection(type: type, items: sortedItems)
+            }
+            .sorted {
+                HomeSection.order(for: $0.type) < HomeSection.order(for: $1.type)
+            }
+        
+        state = sections.isEmpty ? .empty : .content
     }
 }

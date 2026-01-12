@@ -8,14 +8,22 @@
 import SwiftUI
 
 struct HomeView: View {
+
     let viewModel: HomeViewModel
-    
+
     var body: some View {
-        List {
-            ForEach(viewModel.sections) { section in
-                Section(section.title) {
-                    ForEach(section.items) { item in
-                        Text(item.title)
+        Group {
+            switch viewModel.state {
+            case .empty:
+                HomeEmptyStateView()
+            case .content:
+                List {
+                    ForEach(viewModel.sections) { section in
+                        Section(section.title) {
+                            ForEach(section.items) { item in
+                                Text(item.title)
+                            }
+                        }
                     }
                 }
             }
