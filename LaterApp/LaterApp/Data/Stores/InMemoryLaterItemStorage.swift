@@ -11,7 +11,7 @@ final class InMemoryLaterItemStorage: LaterItemStore {
    
     private var items: [LaterItem] = []
     
-    init(items: [LaterItem]) {
+    init(items: [LaterItem] = []) {
         self.items = items
     }
     
