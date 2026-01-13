@@ -8,13 +8,20 @@
 import SwiftUI
 
 struct RootView: View {
+    
+    let store: LaterItemStore
+    
     var body: some View {
         NavigationStack {
-            HomeView()
+            HomeView(
+                viewModel: HomeViewModel(store: store)
+            )
         }
     }
 }
 
 #Preview {
-    RootView()
+    RootView(
+        store: InMemoryLaterItemStorage(items: [])
+    )
 }
