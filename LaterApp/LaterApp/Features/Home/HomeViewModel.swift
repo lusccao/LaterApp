@@ -32,10 +32,10 @@ final class HomeViewModel {
         do {
             try? await Task.sleep(for: .milliseconds(600))
             
-            // TODO: - Simulação de erro ocasional, remover no futuro
-            if Bool.random() {
-                throw URLError(.badServerResponse)
-            }
+//            // TODO: - Simulação de erro ocasional, remover no futuro
+//            if Bool.random() {
+//                throw URLError(.badServerResponse)
+//            }
             
             let items = store.fetchAll()
             
