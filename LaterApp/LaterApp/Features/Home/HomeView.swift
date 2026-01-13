@@ -14,8 +14,17 @@ struct HomeView: View {
     var body: some View {
         Group {
             switch viewModel.state {
+            case .loading:
+                HomeSkeletonView()
             case .empty:
-                HomeEmptyStateView()
+                HomeEmptyStateView() {
+                    print("Abrir fluxo de criação de task")
+                }
+                
+            case .error:
+                HomeErrorStateView() {
+                    await viewModel.load()
+                }
             case .content:
                 List {
                     ForEach(viewModel.sections) { section in
@@ -25,6 +34,9 @@ struct HomeView: View {
                             }
                         }
                     }
+                }
+                .refreshable {
+                    await viewModel.load()
                 }
             }
         }

@@ -8,6 +8,8 @@
 import Foundation
 
 enum HomeViewState: Equatable {
+    case loading
     case empty
     case content
+    case error
 }

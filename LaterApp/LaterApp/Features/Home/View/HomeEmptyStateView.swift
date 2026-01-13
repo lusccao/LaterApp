@@ -5,10 +5,12 @@
 //  Created by Lucas Arthur Chagas Feitosa on 12/01/26.
 //
 
-import Foundation
 import SwiftUI
 
 struct HomeEmptyStateView: View {
+    
+    let onAddTask: () -> Void
+    
     var body: some View {
         VStack(spacing: 16) {
             Image(systemName: "bookmark")
@@ -23,6 +25,11 @@ struct HomeEmptyStateView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
+            
+            Button("Adicionar tarefa") {
+                onAddTask()
+            }
+            .buttonStyle(.borderedProminent)
         }
         .padding()
     }
