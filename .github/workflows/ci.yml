@@ -25,5 +25,5 @@ jobs:
           xcodebuild \
             -project LaterApp/LaterApp.xcodeproj \
             -scheme LaterApp \
-            -destination 'generic/platform=iOS Simulator' \
+            -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
             clean test
