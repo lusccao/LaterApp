@@ -23,9 +23,10 @@ jobs:
             -project LaterApp/LaterApp.xcodeproj \
             -scheme LaterApp \
             -sdk iphonesimulator \
-            -destination 'generic/platform=iOS Simulator' \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
             -enableCodeCoverage YES \
             clean test
+
 
       - name: Check Coverage (minimum 75%)
         run: |
