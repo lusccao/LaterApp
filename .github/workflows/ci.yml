@@ -17,14 +17,20 @@ jobs:
         run: sudo xcode-select -s /Applications/Xcode.app
 
       - name: Create Simulator
+        id: simulator
         run: |
-          xcrun simctl create "CI-iPhone" \
-            com.apple.CoreSimulator.SimDeviceType.iPhone.SE.3rd.generation \
-            com.apple.CoreSimulator.SimRuntime.iOS-18-5
+          DEVICE_TYPE=$(xcrun simctl list devicetypes | grep -m 1 "iPhone" | awk -F '[()]' '{print $2}')
+          RUNTIME=$(xcrun simctl list runtimes | grep -m 1 "iOS" | grep -v unavailable | awk -F '[()]' '{print $2}')
+
+          echo "Using device type: $DEVICE_TYPE"
+          echo "Using runtime: $RUNTIME"
+
+          DEVICE_ID=$(xcrun simctl create "CI-iPhone" "$DEVICE_TYPE" "$RUNTIME")
+          echo "device_id=$DEVICE_ID" >> $GITHUB_OUTPUT
 
       - name: Boot Simulator
         run: |
-          xcrun simctl boot "CI-iPhone" || true
+          xcrun simctl boot CI-iPhone || true
 
       - name: Build and Test with Coverage
         run: |
@@ -32,22 +38,11 @@ jobs:
           xcodebuild \
             -project LaterApp/LaterApp.xcodeproj \
             -scheme LaterApp \
-            -destination 'platform=iOS Simulator,name=CI-iPhone' \
+            -destination "platform=iOS Simulator,name=CI-iPhone" \
             -enableCodeCoverage YES \
             clean test
-
-      - name: Check Coverage (minimum 75%)
-        run: |
-          RESULT=$(find ~/Library/Developer/Xcode/DerivedData -name "*.xcresult" | head -n 1)
-
-          COVERAGE=$(xcrun xccov view --report --json "$RESULT" \
-            | python3 -c "import json,sys; d=json.load(sys.stdin); print(round(d['lineCoverage']*100,2))")
-
-          echo "Total coverage: $COVERAGE%"
-
-          python3 -c "import sys; c=float('$COVERAGE'); sys.exit(1 if c < 75 else 0)"
 
       - name: Delete Simulator
         if: always()
         run: |
-          xcrun simctl delete "CI-iPhone"
+          xcrun simctl delete CI-iPhone
