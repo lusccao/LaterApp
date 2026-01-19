@@ -2,12 +2,9 @@ name: CI
 
 on:
   pull_request:
-    branches:
-      - develop
-      - main
+    branches: [ develop, main ]
   push:
-    branches:
-      - develop
+    branches: [ develop ]
 
 jobs:
   build-and-test:
@@ -20,10 +17,27 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
-      - name: Build and Test (iOS Simulator)
+      - name: Get latest iOS runtime
+        id: runtime
+        run: |
+          RUNTIME=$(xcrun simctl list runtimes \
+            | grep "iOS" \
+            | grep -v unavailable \
+            | tail -n 1 \
+            | awk -F '[()]' '{print $2}')
+          echo "runtime=$RUNTIME" >> $GITHUB_OUTPUT
+
+      - name: Create and boot simulator
+        run: |
+          DEVICE_ID=$(xcrun simctl create "CI-iPhone" \
+            com.apple.CoreSimulator.SimDeviceType.iPhone \
+            ${{ steps.runtime.outputs.runtime }})
+          xcrun simctl boot "$DEVICE_ID"
+
+      - name: Build and Test
         run: |
           xcodebuild \
             -project LaterApp/LaterApp.xcodeproj \
             -scheme LaterApp \
-            -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
+            -destination 'platform=iOS Simulator,name=CI-iPhone' \
             clean test
