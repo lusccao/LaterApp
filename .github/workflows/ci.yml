@@ -16,17 +16,25 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
+      - name: Create Simulator
+        run: |
+          xcrun simctl create "CI-iPhone" \
+            com.apple.CoreSimulator.SimDeviceType.iPhone.SE.3rd.generation \
+            com.apple.CoreSimulator.SimRuntime.iOS-18-5
+
+      - name: Boot Simulator
+        run: |
+          xcrun simctl boot "CI-iPhone" || true
+
       - name: Build and Test with Coverage
         run: |
           set -o pipefail
           xcodebuild \
             -project LaterApp/LaterApp.xcodeproj \
             -scheme LaterApp \
-            -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -destination 'platform=iOS Simulator,name=CI-iPhone' \
             -enableCodeCoverage YES \
             clean test
-
 
       - name: Check Coverage (minimum 75%)
         run: |
@@ -38,3 +46,8 @@ jobs:
           echo "Total coverage: $COVERAGE%"
 
           python3 -c "import sys; c=float('$COVERAGE'); sys.exit(1 if c < 75 else 0)"
+
+      - name: Delete Simulator
+        if: always()
+        run: |
+          xcrun simctl delete "CI-iPhone"
