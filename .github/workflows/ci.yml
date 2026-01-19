@@ -11,19 +11,12 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
-      - name: Get available simulator
-        id: simulator
-        run: |
-          DEVICE_ID=$(xcrun simctl list devices available | grep -m 1 -oE "[A-F0-9-]{36}")
-          echo "device_id=$DEVICE_ID" >> $GITHUB_OUTPUT
-
-            - name: Build and Test with Coverage
+      - name: Build and Test with Coverage
         run: |
           set -o pipefail
           xcodebuild \
@@ -34,32 +27,13 @@ jobs:
             -enableCodeCoverage YES \
             clean test
 
-      - name: Extract Coverage
+      - name: Check Coverage (minimum 75%)
         run: |
           RESULT=$(find ~/Library/Developer/Xcode/DerivedData -name "*.xcresult" | head -n 1)
 
-          echo "Using result bundle: $RESULT"
+          COVERAGE=$(xcrun xccov view --report --json "$RESULT" \
+            | python3 -c "import json,sys; d=json.load(sys.stdin); print(round(d['lineCoverage']*100,2))")
 
-          xcrun xccov view --report --json "$RESULT" > coverage.json
-
-          python3 - <<EOF
-import json
-with open("coverage.json") as f:
-    data = json.load(f)
-
-coverage = round(data["lineCoverage"] * 100, 2)
-print(f"COVERAGE={coverage}")
-EOF >> $GITHUB_ENV
-
-      - name: Check Coverage (minimum 75%)
-        run: |
           echo "Total coverage: $COVERAGE%"
 
-          python3 - <<EOF
-coverage = float("$COVERAGE")
-if coverage < 75:
-    print("❌ Coverage below 75%")
-    exit(1)
-else:
-    print("✅ Coverage OK")
-EOF
+          python3 -c "import sys; c=float('$COVERAGE'); sys.exit(1 if c < 75 else 0)"
