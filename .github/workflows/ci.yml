@@ -17,26 +17,22 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
-      - name: Get available simulator
-        id: simulator
-        run: |
-          DEVICE_ID=$(xcrun simctl list devices available | grep -m 1 -oE "[A-F0-9-]{36}")
-          echo "device_id=$DEVICE_ID" >> $GITHUB_OUTPUT
-          
-      - name: Build and Test
+      - name: Build and Test with Coverage
         run: |
           set -o pipefail
           xcodebuild \
             -project LaterApp/LaterApp.xcodeproj \
             -scheme LaterApp \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -destination 'generic/platform=iOS Simulator' \
             -enableCodeCoverage YES \
             clean test | xcpretty
 
       - name: Check Coverage (minimum 75%)
         run: |
-          COVERAGE=$(xcrun xccov view --report --json $(find ~/Library/Developer/Xcode/DerivedData -name "*.xcresult" | head -n 1) \
+          RESULT=$(find ~/Library/Developer/Xcode/DerivedData -name "*.xcresult" | head -n 1)
+
+          COVERAGE=$(xcrun xccov view --report --json "$RESULT" \
             | python3 - <<EOF
 import json, sys
 data = json.load(sys.stdin)
@@ -46,9 +42,11 @@ EOF
 
           echo "Total coverage: $COVERAGE%"
 
-          if (( $(echo "$COVERAGE < 75" | bc -l) )); then
-            echo "❌ Coverage below 75%"
-            exit 1
-          else
-            echo "✅ Coverage OK"
-          fi
+          python3 - <<EOF
+coverage = float("$COVERAGE")
+if coverage < 75:
+    print("❌ Coverage below 75%")
+    exit(1)
+else:
+    print("✅ Coverage OK")
+EOF
