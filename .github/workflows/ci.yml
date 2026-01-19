@@ -30,3 +30,28 @@ jobs:
             -scheme LaterApp \
             -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=latest' \
             clean test
+        
+            - name: Check Coverage (minimum 75%)
+        run: |
+          RESULT=$(find ~/Library/Developer/Xcode/DerivedData -name "*.xcresult" | head -n 1)
+
+          echo "Using result bundle: $RESULT"
+
+          COVERAGE=$(xcrun xccov view --report --json "$RESULT" \
+            | python3 - <<EOF
+import json, sys
+data = json.load(sys.stdin)
+print(round(data["lineCoverage"] * 100, 2))
+EOF
+          )
+
+          echo "Total coverage: $COVERAGE%"
+
+          python3 - <<EOF
+coverage = float("$COVERAGE")
+if coverage < 75:
+    print("❌ Coverage below 75%")
+    exit(1)
+else:
+    print("✅ Coverage OK")
+EOF
