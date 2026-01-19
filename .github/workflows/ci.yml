@@ -23,28 +23,36 @@ jobs:
           DEVICE_ID=$(xcrun simctl list devices available | grep -m 1 -oE "[A-F0-9-]{36}")
           echo "device_id=$DEVICE_ID" >> $GITHUB_OUTPUT
 
-      - name: Build and Test
+            - name: Build and Test with Coverage
         run: |
+          set -o pipefail
           xcodebuild \
             -project LaterApp/LaterApp.xcodeproj \
             -scheme LaterApp \
-            -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=latest' \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -enableCodeCoverage YES \
             clean test
-        
-            - name: Check Coverage (minimum 75%)
+
+      - name: Extract Coverage
         run: |
           RESULT=$(find ~/Library/Developer/Xcode/DerivedData -name "*.xcresult" | head -n 1)
 
           echo "Using result bundle: $RESULT"
 
-          COVERAGE=$(xcrun xccov view --report --json "$RESULT" \
-            | python3 - <<EOF
-import json, sys
-data = json.load(sys.stdin)
-print(round(data["lineCoverage"] * 100, 2))
-EOF
-          )
+          xcrun xccov view --report --json "$RESULT" > coverage.json
 
+          python3 - <<EOF
+import json
+with open("coverage.json") as f:
+    data = json.load(f)
+
+coverage = round(data["lineCoverage"] * 100, 2)
+print(f"COVERAGE={coverage}")
+EOF >> $GITHUB_ENV
+
+      - name: Check Coverage (minimum 75%)
+        run: |
           echo "Total coverage: $COVERAGE%"
 
           python3 - <<EOF
