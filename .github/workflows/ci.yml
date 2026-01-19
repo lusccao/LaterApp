@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: macos-14
+    runs-on: macos-latest
 
     steps:
       - name: Checkout
@@ -17,40 +17,10 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
-      - name: Get latest iOS runtime
-        id: runtime
-        run: |
-          RUNTIME=$(xcrun simctl list runtimes \
-            | grep "iOS" \
-            | grep -v unavailable \
-            | tail -n 1 \
-            | awk -F '[()]' '{print $2}')
-          echo "runtime=$RUNTIME" >> $GITHUB_OUTPUT
-
-      - name: Get available iPhone device type
-        id: devicetype
-        run: |
-          DEVICE_TYPE=$(xcrun simctl list devicetypes \
-            | grep "iPhone" \
-            | head -n 1 \
-            | awk -F '[()]' '{print $2}')
-          echo "deviceType=$DEVICE_TYPE" >> $GITHUB_OUTPUT
-
-      - name: Create and boot simulator
-        run: |
-          DEVICE_ID=$(xcrun simctl create "CI-iPhone" \
-            "${{ steps.devicetype.outputs.deviceType }}" \
-            "${{ steps.runtime.outputs.runtime }}")
-          xcrun simctl boot "$DEVICE_ID"
-
       - name: Build and Test
         run: |
           xcodebuild \
             -project LaterApp/LaterApp.xcodeproj \
             -scheme LaterApp \
-            -destination 'platform=iOS Simulator,name=CI-iPhone' \
+            -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=latest' \
             clean test
-
-      - name: Cleanup simulator
-        if: always()
-        run: xcrun simctl delete CI-iPhone
