@@ -11,19 +11,12 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
-      - name: Get available simulator
-        id: simulator
-        run: |
-          DEVICE_ID=$(xcrun simctl list devices available | grep -m 1 -oE "[A-F0-9-]{36}")
-          echo "device_id=$DEVICE_ID" >> $GITHUB_OUTPUT
-
-            - name: Build and Test with Coverage
+      - name: Build and Test with Coverage
         run: |
           set -o pipefail
           xcodebuild \
