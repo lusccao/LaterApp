@@ -19,14 +19,21 @@ jobs:
       - name: Create Simulator
         id: simulator
         run: |
-          DEVICE_TYPE=$(xcrun simctl list devicetypes | grep -m 1 "iPhone" | awk -F '[()]' '{print $2}')
-          RUNTIME=$(xcrun simctl list runtimes | grep -m 1 "iOS" | grep -v unavailable | awk -F '[()]' '{print $2}')
+          DEVICE_TYPE=$(xcrun simctl list devicetypes -j \
+            | jq -r '.devicetypes[] | select(.name | contains("iPhone")) | .identifier' \
+            | head -n 1)
+
+          RUNTIME=$(xcrun simctl list runtimes -j \
+            | jq -r '.runtimes[] | select(.name | contains("iOS") and .isAvailable == true) | .identifier' \
+            | head -n 1)
 
           echo "Using device type: $DEVICE_TYPE"
           echo "Using runtime: $RUNTIME"
 
           DEVICE_ID=$(xcrun simctl create "CI-iPhone" "$DEVICE_TYPE" "$RUNTIME")
+
           echo "device_id=$DEVICE_ID" >> $GITHUB_OUTPUT
+
 
       - name: Boot Simulator
         run: |
