@@ -5,6 +5,7 @@
 //  Created by Lucas Arthur Chagas Feitosa on 13/01/26.
 //
 
+import Foundation
 @testable import LaterApp
 
 final class MockLaterItemStore: LaterItemStore {

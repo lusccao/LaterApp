@@ -2,31 +2,46 @@ name: CI
 
 on:
   pull_request:
-    branches: [ develop, main ]
+    branches: [develop, main]
   push:
-    branches: [ develop ]
+    branches: [develop]
 
 jobs:
   build-and-test:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
-      - name: Get available simulator
-        id: simulator
+      - name: Build and Test with Coverage
         run: |
-          DEVICE_ID=$(xcrun simctl list devices available | grep -m 1 -oE "[A-F0-9-]{36}")
-          echo "device_id=$DEVICE_ID" >> $GITHUB_OUTPUT
-
-      - name: Build and Test
-        run: |
+          set -o pipefail
           xcodebuild \
             -project LaterApp/LaterApp.xcodeproj \
             -scheme LaterApp \
-            -destination 'platform=iOS Simulator,name=iPhone SE (3rd generation),OS=latest' \
-            clean test
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -enableCodeCoverage YES \
+            clean test | xcpretty
+
+      - name: Check Coverage (minimum 75%)
+        run: |
+          COVERAGE=$(xcrun xccov view --report --json $(find ~/Library/Developer/Xcode/DerivedData -name "*.xcresult" | head -n 1) \
+            | python3 - <<EOF
+import json, sys
+data = json.load(sys.stdin)
+print(round(data["lineCoverage"] * 100, 2))
+EOF
+          )
+
+          echo "Total coverage: $COVERAGE%"
+
+          if (( $(echo "$COVERAGE < 75" | bc -l) )); then
+            echo "❌ Coverage below 75%"
+            exit 1
+          else
+            echo "✅ Coverage OK"
+          fi
