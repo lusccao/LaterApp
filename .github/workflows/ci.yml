@@ -44,26 +44,31 @@ jobs:
             clean test
 
       # ---------------------------------------------------
-      # Coverage check ≥ 65%
+      # Coverage check ≥ 75%
       # ---------------------------------------------------
-      - name: Check Coverage (minimum 65%)
+      - name: Check Coverage (minimum 75%)
         run: |
           RESULT_BUNDLE=$(find ~/Library/Developer/Xcode/DerivedData -name "*.xcresult" | head -n 1)
 
-          COVERAGE=$(xcrun xccov view --report "$RESULT_BUNDLE" \
-            | grep "Line Coverage" \
-            | awk '{print $3}' \
-            | tr -d '%')
+          COVERAGE_RAW=$(xcrun xccov view --report "$RESULT_BUNDLE" \
+            | grep "Line Coverage")
 
-          echo "Total coverage: $COVERAGE%"
+          echo "Coverage report:"
+          echo "$COVERAGE_RAW"
+
+          COVERAGE=$(echo "$COVERAGE_RAW" | awk '{print $3}' | tr -d '%')
+          MIN_COVERAGE=75
+
+          echo "➡️ Total coverage: $COVERAGE%"
+          echo "➡️ Minimum required: $MIN_COVERAGE%"
 
           COVERAGE_INT=$(printf "%.0f" "$COVERAGE")
 
-          if [ "$COVERAGE_INT" -lt 65 ]; then
-            echo "❌ Coverage below 65%"
+          if [ "$COVERAGE_INT" -lt "$MIN_COVERAGE" ]; then
+            echo "❌ Coverage $COVERAGE% is below minimum $MIN_COVERAGE%"
             exit 1
           else
-            echo "✅ Coverage OK"
+            echo "✅ Coverage OK ($COVERAGE% ≥ $MIN_COVERAGE%)"
           fi
 
       # ---------------------------------------------------
