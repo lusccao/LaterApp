@@ -7,7 +7,7 @@ on:
     branches: [ develop ]
 
 jobs:
-  build-and-test:
+  build-test-coverage:
     runs-on: macos-latest
 
     steps:
@@ -18,41 +18,32 @@ jobs:
         run: sudo xcode-select -s /Applications/Xcode.app
 
       # ---------------------------------------------------
-      # Create a concrete iOS Simulator dynamically
+      # Create concrete iOS Simulator (robust)
       # ---------------------------------------------------
       - name: Create and boot iOS Simulator
         id: simulator
         run: |
           set -e
 
-          echo "Fetching device type..."
           DEVICE_TYPE=$(xcrun simctl list devicetypes -j \
             | jq -r '.devicetypes[]
               | select(.identifier | contains("iPhone"))
               | .identifier' \
             | head -n 1)
 
-          echo "Using device type: $DEVICE_TYPE"
-
-          echo "Fetching runtime..."
           RUNTIME=$(xcrun simctl list runtimes -j \
             | jq -r '.runtimes[]
               | select(.identifier | contains("iOS"))
-              | select((.availability // "") | contains("available"))
               | .identifier' \
             | head -n 1)
 
-          echo "Using runtime: $RUNTIME"
-
           DEVICE_ID=$(xcrun simctl create "CI-iPhone" "$DEVICE_TYPE" "$RUNTIME")
-          echo "Created device: $DEVICE_ID"
-
           xcrun simctl boot "$DEVICE_ID"
 
           echo "device_id=$DEVICE_ID" >> $GITHUB_OUTPUT
 
       # ---------------------------------------------------
-      # Build & Test
+      # Build & Test (with coverage)
       # ---------------------------------------------------
       - name: Build and Test
         run: |
@@ -62,12 +53,36 @@ jobs:
             -project LaterApp/LaterApp.xcodeproj \
             -scheme LaterApp \
             -destination "id=${{ steps.simulator.outputs.device_id }}" \
+            -enableCodeCoverage YES \
             clean test
 
       # ---------------------------------------------------
-      # Cleanup (always runs)
+      # Coverage check ≥ 75% (NO EOF)
       # ---------------------------------------------------
-      - name: Shutdown simulator
+      - name: Check Coverage (minimum 75%)
+        run: |
+          RESULT_BUNDLE=$(find ~/Library/Developer/Xcode/DerivedData -name "*.xcresult" | head -n 1)
+
+          COVERAGE=$(xcrun xccov view --report "$RESULT_BUNDLE" \
+            | grep "Line Coverage" \
+            | awk '{print $3}' \
+            | tr -d '%')
+
+          echo "Total coverage: $COVERAGE%"
+
+          COVERAGE_INT=$(printf "%.0f" "$COVERAGE")
+
+          if [ "$COVERAGE_INT" -lt 75 ]; then
+            echo "❌ Coverage below 75%"
+            exit 1
+          else
+            echo "✅ Coverage OK"
+          fi
+
+      # ---------------------------------------------------
+      # Cleanup
+      # ---------------------------------------------------
+      - name: Cleanup simulators
         if: always()
         run: |
           xcrun simctl shutdown all
