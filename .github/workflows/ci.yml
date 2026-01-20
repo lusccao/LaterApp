@@ -18,28 +18,15 @@ jobs:
         run: sudo xcode-select -s /Applications/Xcode.app
 
       # ---------------------------------------------------
-      # Create concrete iOS Simulator (robust)
+      # Get first available iOS Simulator (concrete device)
       # ---------------------------------------------------
-      - name: Create and boot iOS Simulator
+      - name: Get available simulator
         id: simulator
         run: |
-          set -e
+          DEVICE_ID=$(xcrun simctl list devices available \
+            | grep -m 1 -oE "[A-F0-9-]{36}")
 
-          DEVICE_TYPE=$(xcrun simctl list devicetypes -j \
-            | jq -r '.devicetypes[]
-              | select(.identifier | contains("iPhone"))
-              | .identifier' \
-            | head -n 1)
-
-          RUNTIME=$(xcrun simctl list runtimes -j \
-            | jq -r '.runtimes[]
-              | select(.identifier | contains("iOS"))
-              | .identifier' \
-            | head -n 1)
-
-          DEVICE_ID=$(xcrun simctl create "CI-iPhone" "$DEVICE_TYPE" "$RUNTIME")
-          xcrun simctl boot "$DEVICE_ID"
-
+          echo "Using simulator: $DEVICE_ID"
           echo "device_id=$DEVICE_ID" >> $GITHUB_OUTPUT
 
       # ---------------------------------------------------
@@ -57,7 +44,7 @@ jobs:
             clean test
 
       # ---------------------------------------------------
-      # Coverage check ≥ 75% (NO EOF)
+      # Coverage check ≥ 75%
       # ---------------------------------------------------
       - name: Check Coverage (minimum 75%)
         run: |
@@ -85,5 +72,4 @@ jobs:
       - name: Cleanup simulators
         if: always()
         run: |
-          xcrun simctl shutdown all
-          xcrun simctl delete unavailable
+          xcrun simctl shutdown all || true
