@@ -11,50 +11,64 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
-      - name: Create Simulator
+      # ---------------------------------------------------
+      # Create a concrete iOS Simulator dynamically
+      # ---------------------------------------------------
+      - name: Create and boot iOS Simulator
         id: simulator
         run: |
+          set -e
+
+          echo "Fetching device type..."
           DEVICE_TYPE=$(xcrun simctl list devicetypes -j \
             | jq -r '.devicetypes[]
-              | select(.name | contains("iPhone"))
+              | select(.identifier | contains("iPhone"))
               | .identifier' \
             | head -n 1)
 
-          RUNTIME=$(xcrun simctl list runtimes -j \
-          | jq -r '.runtimes[]
-            | select(.identifier | contains("iOS"))
-            | select((.availability // "") | contains("available") or (.availability == null))
-            | .identifier' \
-          | head -n 1)
-
           echo "Using device type: $DEVICE_TYPE"
+
+          echo "Fetching runtime..."
+          RUNTIME=$(xcrun simctl list runtimes -j \
+            | jq -r '.runtimes[]
+              | select(.identifier | contains("iOS"))
+              | select((.availability // "") | contains("available"))
+              | .identifier' \
+            | head -n 1)
+
           echo "Using runtime: $RUNTIME"
 
           DEVICE_ID=$(xcrun simctl create "CI-iPhone" "$DEVICE_TYPE" "$RUNTIME")
+          echo "Created device: $DEVICE_ID"
+
+          xcrun simctl boot "$DEVICE_ID"
 
           echo "device_id=$DEVICE_ID" >> $GITHUB_OUTPUT
 
-
-      - name: Boot Simulator
-        run: |
-          xcrun simctl boot CI-iPhone || true
-
-      - name: Build and Test with Coverage
+      # ---------------------------------------------------
+      # Build & Test
+      # ---------------------------------------------------
+      - name: Build and Test
         run: |
           set -o pipefail
+
           xcodebuild \
             -project LaterApp/LaterApp.xcodeproj \
             -scheme LaterApp \
-            -destination "platform=iOS Simulator,name=CI-iPhone" \
-            -enableCodeCoverage YES \
+            -destination "id=${{ steps.simulator.outputs.device_id }}" \
             clean test
 
-      - name: Delete Simulator
+      # ---------------------------------------------------
+      # Cleanup (always runs)
+      # ---------------------------------------------------
+      - name: Shutdown simulator
         if: always()
         run: |
-          xcrun simctl delete CI-iPhone
+          xcrun simctl shutdown all
+          xcrun simctl delete unavailable
