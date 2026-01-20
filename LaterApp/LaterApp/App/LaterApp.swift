@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct LaterApp: App {
+    
+    private let store = InMemoryLaterItemStorage()
+    
     var body: some Scene {
         WindowGroup {
-            RootView()
+            RootView(store: store)
         }
     }
 }

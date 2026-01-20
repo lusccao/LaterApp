@@ -2,28 +2,79 @@ name: CI
 
 on:
   pull_request:
-    branches:
-      - develop
-      - main
+    branches: [ develop, main ]
   push:
-    branches:
-      - develop
+    branches: [ develop ]
 
 jobs:
-  build:
+  build-test-coverage:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
-      - name: Build (iOS Simulator)
+      # ---------------------------------------------------
+      # Get first available iOS Simulator (concrete device)
+      # ---------------------------------------------------
+      - name: Get available simulator
+        id: simulator
         run: |
+          DEVICE_ID=$(xcrun simctl list devices available \
+            | grep -m 1 -oE "[A-F0-9-]{36}")
+
+          echo "Using simulator: $DEVICE_ID"
+          echo "device_id=$DEVICE_ID" >> $GITHUB_OUTPUT
+
+      # ---------------------------------------------------
+      # Build & Test (with coverage)
+      # ---------------------------------------------------
+      - name: Build and Test
+        run: |
+          set -o pipefail
+
           xcodebuild \
             -project LaterApp/LaterApp.xcodeproj \
             -scheme LaterApp \
-            -sdk iphonesimulator \
-            -destination 'generic/platform=iOS Simulator' \
-            clean build
+            -destination "id=${{ steps.simulator.outputs.device_id }}" \
+            -enableCodeCoverage YES \
+            clean test
+
+      # ---------------------------------------------------
+      # Coverage check ≥ 75%
+      # ---------------------------------------------------
+      - name: Check Coverage (minimum 75%)
+        run: |
+          RESULT_BUNDLE=$(find ~/Library/Developer/Xcode/DerivedData -name "*.xcresult" | head -n 1)
+
+          COVERAGE_RAW=$(xcrun xccov view --report "$RESULT_BUNDLE" \
+            | grep "Line Coverage")
+
+          echo "Coverage report:"
+          echo "$COVERAGE_RAW"
+
+          COVERAGE=$(echo "$COVERAGE_RAW" | awk '{print $3}' | tr -d '%')
+          MIN_COVERAGE=75
+
+          echo "➡️ Total coverage: $COVERAGE%"
+          echo "➡️ Minimum required: $MIN_COVERAGE%"
+
+          COVERAGE_INT=$(printf "%.0f" "$COVERAGE")
+
+          if [ "$COVERAGE_INT" -lt "$MIN_COVERAGE" ]; then
+            echo "❌ Coverage $COVERAGE% is below minimum $MIN_COVERAGE%"
+            exit 1
+          else
+            echo "✅ Coverage OK ($COVERAGE% ≥ $MIN_COVERAGE%)"
+          fi
+
+      # ---------------------------------------------------
+      # Cleanup
+      # ---------------------------------------------------
+      - name: Cleanup simulators
+        if: always()
+        run: |
+          xcrun simctl shutdown all || true

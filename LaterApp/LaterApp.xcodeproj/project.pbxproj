@@ -6,8 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		A0F3587C2F166F4400F4B887 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A03E561F2F0D223D00B5DFB8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A03E56262F0D223D00B5DFB8;
+			remoteInfo = LaterApp;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		A03E56272F0D223D00B5DFB8 /* LaterApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LaterApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0F358782F166F4400F4B887 /* LaterAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LaterAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +27,22 @@
 			path = LaterApp;
 			sourceTree = "<group>";
 		};
+		A0F358792F166F4400F4B887 /* LaterAppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = LaterAppTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		A03E56242F0D223D00B5DFB8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A0F358752F166F4400F4B887 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,6 +56,7 @@
 			isa = PBXGroup;
 			children = (
 				A03E56292F0D223D00B5DFB8 /* LaterApp */,
+				A0F358792F166F4400F4B887 /* LaterAppTests */,
 				A03E56282F0D223D00B5DFB8 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +65,7 @@
 			isa = PBXGroup;
 			children = (
 				A03E56272F0D223D00B5DFB8 /* LaterApp.app */,
+				A0F358782F166F4400F4B887 /* LaterAppTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,6 +95,29 @@
 			productReference = A03E56272F0D223D00B5DFB8 /* LaterApp.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A0F358772F166F4400F4B887 /* LaterAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A0F3587E2F166F4400F4B887 /* Build configuration list for PBXNativeTarget "LaterAppTests" */;
+			buildPhases = (
+				A0F358742F166F4400F4B887 /* Sources */,
+				A0F358752F166F4400F4B887 /* Frameworks */,
+				A0F358762F166F4400F4B887 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A0F3587D2F166F4400F4B887 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A0F358792F166F4400F4B887 /* LaterAppTests */,
+			);
+			name = LaterAppTests;
+			packageProductDependencies = (
+			);
+			productName = LaterAppTests;
+			productReference = A0F358782F166F4400F4B887 /* LaterAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -82,6 +130,10 @@
 				TargetAttributes = {
 					A03E56262F0D223D00B5DFB8 = {
 						CreatedOnToolsVersion = 26.2;
+					};
+					A0F358772F166F4400F4B887 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = A03E56262F0D223D00B5DFB8;
 					};
 				};
 			};
@@ -100,12 +152,20 @@
 			projectRoot = "";
 			targets = (
 				A03E56262F0D223D00B5DFB8 /* LaterApp */,
+				A0F358772F166F4400F4B887 /* LaterAppTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		A03E56252F0D223D00B5DFB8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A0F358762F166F4400F4B887 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +182,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A0F358742F166F4400F4B887 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A0F3587D2F166F4400F4B887 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A03E56262F0D223D00B5DFB8 /* LaterApp */;
+			targetProxy = A0F3587C2F166F4400F4B887 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		A03E56302F0D223E00B5DFB8 /* Debug */ = {
@@ -261,6 +336,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -297,6 +373,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -318,6 +395,50 @@
 			};
 			name = Release;
 		};
+		A0F3587F2F166F4400F4B887 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 34XH8T73AS;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = chagas.lucas.LaterAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LaterApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LaterApp";
+			};
+			name = Debug;
+		};
+		A0F358802F166F4400F4B887 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 34XH8T73AS;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = chagas.lucas.LaterAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LaterApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LaterApp";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -335,6 +456,15 @@
 			buildConfigurations = (
 				A03E56332F0D223E00B5DFB8 /* Debug */,
 				A03E56342F0D223E00B5DFB8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A0F3587E2F166F4400F4B887 /* Build configuration list for PBXNativeTarget "LaterAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A0F3587F2F166F4400F4B887 /* Debug */,
+				A0F358802F166F4400F4B887 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
