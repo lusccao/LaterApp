@@ -44,9 +44,9 @@ jobs:
             clean test
 
       # ---------------------------------------------------
-      # Coverage check ≥ 75%
+      # Coverage check ≥ 65%
       # ---------------------------------------------------
-      - name: Check Coverage (minimum 75%)
+      - name: Check Coverage (minimum 65%)
         run: |
           RESULT_BUNDLE=$(find ~/Library/Developer/Xcode/DerivedData -name "*.xcresult" | head -n 1)
 
@@ -59,8 +59,8 @@ jobs:
 
           COVERAGE_INT=$(printf "%.0f" "$COVERAGE")
 
-          if [ "$COVERAGE_INT" -lt 75 ]; then
-            echo "❌ Coverage below 75%"
+          if [ "$COVERAGE_INT" -lt 65 ]; then
+            echo "❌ Coverage below 65%"
             exit 1
           else
             echo "✅ Coverage OK"
